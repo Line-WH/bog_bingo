@@ -4,15 +4,16 @@
  */
 
 require "settings/init.php";
+require "classes/auth.php";
 
 session_start();
 
 $error = "";
 $success = "";
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = htmlspecialchars($_POST["username"]);
-    $password = htmlspecialchars($_POST["password"]);
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $username = trim($_POST["username"]) ?? "";
+    $password = ($_POST["password"]) ?? "";
 
     if (strlen($username) < 3 || strlen($username) > 14) {
         $error = "Username must be between 3 and 14 characters";
