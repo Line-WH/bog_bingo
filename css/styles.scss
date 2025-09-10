@@ -18,3 +18,66 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
 @import "bootstrapComponents";
 
 // 5. Du kan lave styling her...
+/* ========== Bogbingo – styles ========== */
+.root {
+  --accent: #7c4dff;
+}
+
+/* Base */
+body {
+  background: #f8f9fa;
+}
+
+/* Kort & progressbar */
+.card {
+  border: 0;
+  border-radius: 1rem;
+  box-shadow: 0 10px 25px rgba(0,0,0,.08);
+}
+.progress {
+  height: .75rem;
+}
+
+/* Bingo-grid */
+.bingo-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: .5rem;
+}
+@media (max-width: 768px) {
+  .bingo-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+/* Celler */
+.bingo-cell {
+  position: relative;
+  background: #fff;
+  border: 1px solid #e9ecef;
+  border-radius: .75rem;
+  padding: .85rem;
+  cursor: pointer;
+  user-select: none;
+  transition: background .2s, border-color .2s;
+}
+.bingo-cell:hover { background: #f1f3f5; }
+.bingo-cell .label-text {
+  display: block;
+  text-align: left;
+  padding-right: .5rem;
+}
+
+/* Markerede felter */
+.bingo-cell.completed {
+  border-color: var(--accent);
+  background: #f3efff;
+}
+.bingo-cell.completed .label-text {
+  text-decoration: line-through;
+  opacity: .75;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .bingo-cell { transition: none; }
+}
+
