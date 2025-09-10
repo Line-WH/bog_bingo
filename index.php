@@ -36,7 +36,5 @@ require "settings/init.php";
 
 
     <script src="assets/js/app.js"></script>
-
-<br>
 </body>
 </html>
