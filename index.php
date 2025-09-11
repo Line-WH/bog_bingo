@@ -30,12 +30,12 @@ require "settings/init.php";
 
 
     <div class="container">
-        <h1 class="display-4 mb-4">📚 Welcome to Book Bingo!</h1>
-        <p class="lead mb-5">Gamify your reading goals — one square at a time.</p>
+        <h1 class="display-4 mb-4">Velkommen til Bog Bingo</h1>
+        <p class="lead mb-5">Gør læsning til en leg</p>
 
         <div class="d-grid gap-3 col-6 mx-auto">
-                <a href="login.php" class="btn btn-primary btn-lg">Login</a>
-                <a href="register.php" class="btn btn-outline-secondary">Register</a>
+                <a href="login.php" class="btn btn-success btn-lg">Log ind</a>
+                <a href="register.php" class="btn btn-outline-secondary">Opret konto</a>
         </div>
     </div>
 
