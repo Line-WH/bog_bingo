@@ -24,6 +24,11 @@ require "settings/init.php";
 
 <body class="bg-light d-flex flex-column justify-content-center align-items-center vh-100 text-center">
 
+    <?php if (isset($_GET['logout'])): ?>
+        <div class="alert alert-info text-center mb-3">Du er logget ud</div>
+    <?php endif; ?>
+
+
     <div class="container">
         <h1 class="display-4 mb-4">📚 Welcome to Book Bingo!</h1>
         <p class="lead mb-5">Gamify your reading goals — one square at a time.</p>
