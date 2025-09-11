@@ -6,13 +6,13 @@ const EXAMPLE_TASKS = [
     'En fantasy','En sci‑fi','En selvhjælpsbog','En novellesamling','En bog du normalt ikke ville vælge'
 ];
 
-const grid = document.getElementById('bingoGrid');
-const totalCountEl = document.getElementById('totalCount');
-const checkedCountEl = document.getElementById('checkedCount');
-const progressBar = document.getElementById('progressBar');
-const progressPctEl = document.getElementById('progressPct');
-const resetBtn = document.getElementById('resetBtn');
-const shareBtn = document.getElementById('shareBtn');
+const grid = document.querySelector('bingoGrid');
+const totalCountEl = document.querySelector('totalCount');
+const checkedCountEl = document.querySelector('checkedCount');
+const progressBar = document.querySelector('progressBar');
+const progressPctEl = document.querySelector('progressPct');
+const resetBtn = document.querySelector('resetBtn');
+const shareBtn = document.querySelector('shareBtn');
 
 let tasks = [];
 
