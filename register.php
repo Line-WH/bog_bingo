@@ -37,7 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 </head>
 <body class="bg-light d-flex flex-column justify-content-center align-items-center vh-100 text-center">
 <div class="card p-4 shadow" style="min-width:320px;max-width:420px;">
-    <h2 class="mb-3">Registrer</h2>
+    <h2 class="mb-3">Opret Konto</h2>
 
     <?php if ($error): ?>
         <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
@@ -58,6 +58,10 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
         <button class="btn btn-success w-100">Opret konto</button>
     </form>
+
+    <p class="mt-3 mb-0">
+        Har du allerede en konto? <a href="login.php">Login her</a>.
+    </p>
 </div>
 </body>
 </html>
