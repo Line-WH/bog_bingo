@@ -29,4 +29,10 @@ require "settings/init.php";
 
 <script src="assets/js/app.js"></script>
 </body>
+<?php if (isset($_GET['registered'])): ?>
+    <div class="alert alert-success text-center mb-3">
+        Konto oprettet!
+    </div>
+<?php endif; ?>
+
 </html>

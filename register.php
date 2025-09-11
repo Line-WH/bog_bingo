@@ -17,11 +17,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $error = Auth::register($db, $username, $password);
 
     if ($error === "") {
-        // Fetch the row we just created to get loginId
+        // Fetcher LoginId
         $user = Auth::getUserByUsername($db, $username);
         Auth::loginUserSession((int)$user->loginId, $user->loginNavn);
 
-        header("Location: dashboard.php");
+        header("Location: dashboard.php?registered=1");
         exit();
     }
 }
