@@ -24,7 +24,38 @@ require "settings/init.php";
 </head>
 
 <body class="bg-light d-flex flex-column justify-content-center align-items-center vh-100 text-center">
+<?php
+$card = [
+        ["titel" => "kort 1", "text" => " her skal der stå noget tekst", "link" =>"#"]
+        ["titel" => "kort 2", "text" => " her skal der stå noget tekst", "link" =>"#"]
+     ["titel" => "kort 3", "text" => " her skal der stå noget tekst", "link" =>"#"]
 
+];
+?>
+
+
+<div class="row">
+    <?php foreach ($cards as $card): ?>
+    <div class="col-sm-6 mb-3 mb-sm-0">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Special title treatment</h5>
+                <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                <a href="#" class="btn btn-primary">Go somewhere</a>
+            </div>
+        </div>
+    </div>
+    <div class="col-sm-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Special title treatment</h5>
+                <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
+                <a href="#" class="btn btn-primary">Go somewhere</a>
+            </div>
+        </div>
+    </div>
+    <?php endforeach; ?>
+</div>
 
 
 <script src="assets/js/app.js"></script>
