@@ -1,71 +1,65 @@
-const EXAMPLE_TASKS = [
-    'Læs en bog under 200 sider','En bog af en debutforfatter','En prisvindende roman','En bog i en serie','En bog fra din barndom',
-    'En bog sat i et andet land','En non-fiction','En bog udgivet i år','En grafisk roman/tegneserie','En dystopi',
-    'En krimi/thriller','En klassiker','En bog anbefalet af en ven','En bog med et farvenavn i titlen','En bog om natur',
-    'En bog af en dansk forfatter','En bog oversat til dansk','En lydbog','En bog med dyr på forsiden','En bog udgivet før 2000',
-    'En fantasy','En sci‑fi','En selvhjælpsbog','En novellesamling','En bog du normalt ikke ville vælge'
-];
-
-const grid = document.querySelector('bingoGrid');
-const totalCountEl = document.querySelector('totalCount');
-const checkedCountEl = document.querySelector('checkedCount');
-const progressBar = document.querySelector('progressBar');
-const progressPctEl = document.querySelector('progressPct');
-const resetBtn = document.querySelector('resetBtn');
-const shareBtn = document.querySelector('shareBtn');
+const grid = document.querySelector('#bingoGrid');
+const totalCountEl = document.querySelector('#totalCount');
+const checkedCountEl = document.querySelector('#checkedCount');
+const progressBar = document.querySelector('#progressBar');
+const progressPctEl = document.querySelector('#progressPct');
+const resetBtn = document.querySelector('#resetBtn');
+const shareBtn = document.querySelector('#shareBtn');
 
 let tasks = [];
 
-const loadTasks = () => {
-    const saved = localStorage.getItem('bogbingo_tasks_simple');
-    if (saved) {
-        try { tasks = JSON.parse(saved); } catch { tasks = []; }
-    }
-    // Hvis gamle data indeholder "FRI FELT", fjern det og erstat med nyt felt
-    if (tasks?.length) {
-        tasks = tasks.filter(t => !String(t.text).toUpperCase().includes('FRI FELT'));
-    }
+function loadTasks() {
+    // prøv at hente fra localStorage
+    try { tasks = JSON.parse(localStorage.getItem('bogbingo_tasks_simple')) || []; } catch { tasks = []; }
+
+    // hvis tomt, så hent fra tasks.json
     if (!tasks.length) {
-        tasks = EXAMPLE_TASKS.map((t,i)=>({ id:i+1, text:t, done:false }));
-    } else if (tasks.length < 25) {
-        // Fyld op til 25, hvis der mangler efter oprydning
-        const missing = EXAMPLE_TASKS.filter(x => !tasks.some(t => t.text === x))
-            .slice(0, 25 - tasks.length)
-            .map((t,i)=>({ id: tasks.length + i + 1, text:t, done:false }));
-        tasks = tasks.concat(missing);
-    } else if (tasks.length > 25) {
-        tasks = tasks.slice(0,25);
+        fetch('tasks.json')
+            .then(res => res.json())
+            .then(data => {
+                tasks = data.map((t,i) => ({ id: i+1, text: t, done: false }));
+                saveTasks(); renderGrid(); updateProgress();
+            });
+    } else {
+        renderGrid(); updateProgress();
     }
-    saveTasks();
-};
+}
 
-const saveTasks = () => localStorage.setItem('bogbingo_tasks_simple', JSON.stringify(tasks));
+function saveTasks() {
+    localStorage.setItem('bogbingo_tasks_simple', JSON.stringify(tasks));
+}
 
-const updateProgress = () => {
+function updateProgress() {
     const total = tasks.length || 1;
-    const done = tasks.filter(t=>t.done).length;
-    const pct = Math.round((done/total)*100);
+    const done  = tasks.filter(t => t.done).length;
+    const pct   = Math.round(done/total*100);
+
     totalCountEl.textContent = total;
     checkedCountEl.textContent = done;
-    progressBar.style.width = pct+"%";
+    progressBar.style.width = pct + "%";
     progressBar.setAttribute('aria-valuenow', pct);
     progressPctEl.textContent = pct;
-};
 
-const toggleTask = (task, cell) => {
+    // Gør progress-baren grøn når der er fremskridt
+    progressBar.classList.toggle('bg-success', done > 0);
+    progressBar.classList.toggle('bg-primary', done === 0);
+}
+
+
+function toggleTask(task, cell) {
     task.done = !task.done;
     cell.classList.toggle('completed', task.done);
-    saveTasks();
-    updateProgress();
-};
+    cell.setAttribute('aria-pressed', task.done);
+    saveTasks(); updateProgress();
+}
 
-const renderGrid = () => {
+function renderGrid() {
     grid.innerHTML = '';
     tasks.forEach(task => {
         const cell = document.createElement('div');
-        cell.className = 'bingo-cell'+(task.done?' completed':'');
+        cell.className = 'bingo-cell' + (task.done ? ' completed' : '');
         cell.setAttribute('role','button');
-        cell.setAttribute('tabindex','0');
+        cell.tabIndex = 0;
         cell.setAttribute('aria-pressed', task.done);
 
         const text = document.createElement('span');
@@ -73,29 +67,29 @@ const renderGrid = () => {
         text.textContent = task.text;
         cell.appendChild(text);
 
-        cell.addEventListener('click', ()=>{ toggleTask(task, cell); cell.setAttribute('aria-pressed', task.done); });
-        cell.addEventListener('keydown', (e)=>{ if(e.key==='Enter' || e.key===' '){ e.preventDefault(); toggleTask(task, cell); cell.setAttribute('aria-pressed', task.done);} });
+        const onToggle = () => toggleTask(task, cell);
+        cell.addEventListener('click', onToggle);
+        cell.addEventListener('keydown', e => {
+            if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggle(); }
+        });
 
         grid.appendChild(cell);
     });
-};
+}
 
-const resetAll = () => {
-    tasks = tasks.map(t=>({...t, done:false}));
+resetBtn.addEventListener('click', () => {
+    tasks.forEach(t => t.done = false);
     saveTasks(); renderGrid(); updateProgress();
-};
+});
 
-const shareProgress = () => {
+shareBtn.addEventListener('click', () => {
     const total = tasks.length || 1;
     const done = tasks.filter(t=>t.done).length;
-    const pct = Math.round((done/total)*100);
+    const pct  = Math.round(done/total*100);
     const text = `Min Bogbingo-status: ${done}/${total} (${pct}%).`;
-    if(navigator.share){ navigator.share({title:'Bogbingo', text}); }
-    else { navigator.clipboard.writeText(text).then(()=>alert('Status kopieret til udklipsholder!')); }
-};
+    navigator.share ? navigator.share({ title:'Bogbingo', text }) :
+        navigator.clipboard.writeText(text).then(()=>alert('Status kopieret til udklipsholder!'));
+});
 
+// Init
 loadTasks();
-renderGrid();
-updateProgress();
-resetBtn.addEventListener('click', resetAll);
-shareBtn.addEventListener('click', shareProgress);
