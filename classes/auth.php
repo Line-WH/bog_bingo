@@ -56,3 +56,5 @@ class Auth {
         session_destroy();
     }
 }
+
+//skal det være en public static function?
