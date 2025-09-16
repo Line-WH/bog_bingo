@@ -45,7 +45,12 @@ body { background: #f8f9fa; }
   transition: background .2s, border-color .2s, color .2s;
 }
 .bingo-cell:hover { background: #f1f3f5; }
-.bingo-cell .label-text { display: block; text-align: left; padding-right: .5rem; }
+.bingo-cell .label-text { display: block; padding: .6rem .75rem; text-align: left; }
+
+/* Ved markering */
+.bingo-cell.completed .bingo-img { filter: grayscale(100%); opacity: .85; }
+.bingo-cell.completed .label-text { text-decoration: line-through; opacity: .9; }
+
 
 /* Fjern lilla fokus-glow (hold det helt neutralt) */
 .bingo-cell:focus,

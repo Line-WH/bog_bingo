@@ -6,42 +6,31 @@ const progressPctEl = document.querySelector('#progressPct');
 const resetBtn = document.querySelector('#resetBtn');
 const shareBtn = document.querySelector('#shareBtn');
 
-let tasks = []; // <- kun én gang!
+let tasks = [];
 const STORAGE_KEY = 'bogbingo_tasks_v2';
 
 function loadTasks() {
-    //try { tasks = JSON.parse(localStorage.getItem(STORAGE_KEY)) || []; }
-    //catch { tasks = []; }
-
-
-    fetch('./tasks.json')  // sørg for at tasks.json ligger i samme mappe som HTML’en
+    fetch('./tasks.json')
         .then(res => {
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             return res.json();
         })
         .then(data => {
-            if(!data){
-                return;
-            }
-
-            for(const task of data){
-                const div = document.createElement('div');
-                div.innerHTML = `
-                    <p>${task.text}</p>
-                    <img class="img-fluid" src="${task.img}">
-                `;
-
-                grid.appendChild(div);
-            }
+            // gem tasks fra JSON
+            tasks = data.map((t, i) => ({
+                id: i + 1,
+                text: t.text,
+                img: t.img,
+                done: false
+            }));
 
             saveTasks();
-            //renderGrid();
-            //updateProgress();
+            renderGrid();
+            updateProgress();
         })
         .catch(err => {
             console.error('Kunne ikke loade tasks.json:', err);
         });
-
 }
 
 function saveTasks() {
@@ -74,7 +63,7 @@ function toggleTask(task, cell) {
 function renderGrid() {
     grid.innerHTML = '';
     tasks.forEach(task => {
-        const cell = document.querySelector('div');
+        const cell = document.createElement('div');
         cell.className = 'bingo-cell' + (task.done ? ' completed' : '');
         cell.setAttribute('role', 'button');
         cell.tabIndex = 0;
@@ -82,9 +71,9 @@ function renderGrid() {
         cell.setAttribute('aria-label', task.text);
 
         const img = document.createElement('img');
-        img.src = task.img || `https://picsum.photos/seed/${encodeURIComponent(task.text)}/400/260`;
+        img.src = task.img;
         img.alt = task.text;
-        img.className = 'bingo-img';
+        img.className = 'bingo-img img-fluid'; // <-- behold img-fluid her!
         cell.appendChild(img);
 
         const text = document.createElement('span');
@@ -104,6 +93,7 @@ function renderGrid() {
         grid.appendChild(cell);
     });
 }
+
 
 resetBtn.addEventListener('click', () => {
     tasks.forEach(t => t.done = false);
