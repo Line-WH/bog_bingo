@@ -4,9 +4,80 @@
  * @var db $db
  */
 
+
 require "settings/init.php";
 session_start();
+
+$userId   = $_SESSION['user_id'] ?? null;
+$username = $_SESSION['username'] ?? '';
+
+if (!$userId) {           // guard in case someone hits the page directly
+  header("Location: login.php");
+  exit;
+}
+
+/* TABLE NAMES — match your schema */
+$TBL_PLADER  = 'bingoPlade';   // has: kortId, loginId, kortDato
+$TBL_KORT    = 'bingoKort';    // has: pladeId, kortId, promptId, titel, ...
+$TBL_PROMPTS = 'bingoPrompts'; // has: promptId, label
+
+/* 1) Ensure the user has a row in bingoPlade */
+$row = $db->sql(
+  "SELECT kortId FROM {$TBL_PLADER} WHERE loginId = :u LIMIT 1",
+  [':u' => (int)$userId]
+);
+if ($row) {
+  $kortId = (int)$row[0]->kortId;
+} else {
+  $db->sql("INSERT INTO {$TBL_PLADER} (loginId) VALUES (:u)", [':u' => (int)$userId], false);
+  $kortId = (int)$db->sql("SELECT LAST_INSERT_ID() AS id")[0]->id;
+
+  // seed 24 squares from prompts
+  $db->sql(
+    "INSERT INTO {$TBL_KORT} (kortId, promptId)
+     SELECT :k, p.promptId FROM {$TBL_PROMPTS} p",
+    [':k' => $kortId],
+    false
+  );
+}
+
+/* 2) Handle update of a square */
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pladeId'])) {
+  $pladeId   = (int)$_POST['pladeId'];
+  $titel     = trim($_POST['titel'] ?? '');
+  $forfatter = trim($_POST['forfatter'] ?? '');
+  $finished  = isset($_POST['finished']) ? 1 : 0;
+
+  $db->sql(
+    "UPDATE {$TBL_KORT}
+        SET titel = :t, forfatter = :f, finished = :fin
+      WHERE pladeId = :id AND kortId = :k",
+    [
+      ':t' => $titel,
+      ':f' => $forfatter,
+      ':fin' => $finished,
+      ':id' => $pladeId,
+      ':k'  => $kortId
+    ],
+    false
+  );
+
+  header("Location: dashboard.php?saved=1");
+  exit;
+}
+
+/* 3) Load squares */
+$squares = $db->sql(
+  "SELECT k.pladeId, k.titel, k.forfatter, k.finished, p.label
+     FROM {$TBL_KORT} k
+     JOIN {$TBL_PROMPTS} p USING (promptId)
+    WHERE k.kortId = :k
+    ORDER BY p.promptId",
+  [':k' => $kortId]
+);
 ?>
+
+
 <!DOCTYPE html>
 <html lang="da">
 <head>
@@ -26,10 +97,11 @@ session_start();
 <body class="bg-light d-flex flex-column justify-content-center align-items-center vh-100 text-center">
 
 <?php if (isset($_GET['registered'])): ?>
-<div class="alert alert-success text-center mb-3">
-    Konto oprettet!
-</div>
-<?php endif; ?>
+    <div class="alert alert-success text-center mb-3">
+        Konto oprettet!
+    </div>
+<?php endif;
+?>
 
 <?php
 $cards = [
