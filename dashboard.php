@@ -4,46 +4,28 @@
  * @var db $db
  */
 
-
 require "settings/init.php";
 session_start();
 
 $userId   = $_SESSION['user_id'] ?? null;
 $username = $_SESSION['username'] ?? '';
-
-if (!$userId) {           // guard in case someone hits the page directly
+if (!$userId) {           // Sikkerhed for hvis der ikke kan findes en bruger, sendes tilbage til forside
   header("Location: login.php");
   exit;
 }
 
-/* TABLE NAMES — match your schema */
-$TBL_PLADER  = 'bingoPlade';   // has: kortId, loginId, kortDato
-$TBL_KORT    = 'bingoKort';    // has: pladeId, kortId, promptId, titel, ...
-$TBL_PROMPTS = 'bingoPrompts'; // has: promptId, label
+/*Tabelnavne */
+$TBL_PLADER  = 'bingoPlade';   // kortId, loginId, kortDato
+$TBL_KORT    = 'bingoKort';    // pladeId, kortId, promptId, titel, ...
+$TBL_PROMPTS = 'bingoPrompts'; // promptId, label
 
-/* 1) Ensure the user has a row in bingoPlade */
-$row = $db->sql(
-  "SELECT kortId FROM {$TBL_PLADER} WHERE loginId = :u LIMIT 1",
-  [':u' => (int)$userId]
-);
-if ($row) {
-  $kortId = (int)$row[0]->kortId;
-} else {
-  $db->sql("INSERT INTO {$TBL_PLADER} (loginId) VALUES (:u)", [':u' => (int)$userId], false);
-  $kortId = (int)$db->sql("SELECT LAST_INSERT_ID() AS id")[0]->id;
-
-  // seed 24 squares from prompts
-  $db->sql(
-    "INSERT INTO {$TBL_KORT} (kortId, promptId)
-     SELECT :k, p.promptId FROM {$TBL_PROMPTS} p",
-    [':k' => $kortId],
-    false
-  );
-}
+/* sørger for at bruger har en row henter kortId ned */
+$row = $db->sql("SELECT kortId FROM {$TBL_PLADER} WHERE loginId = :loginId LIMIT 1", [':loginId' => $userId]);
+$kortId = $row[0]->kortId;
 
 /* 2) Handle update of a square */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pladeId'])) {
-  $pladeId   = (int)$_POST['pladeId'];
+  $pladeId   = $_POST['pladeId'];
   $titel     = trim($_POST['titel'] ?? '');
   $forfatter = trim($_POST['forfatter'] ?? '');
   $finished  = isset($_POST['finished']) ? 1 : 0;
@@ -51,13 +33,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pladeId'])) {
   $db->sql(
     "UPDATE {$TBL_KORT}
         SET titel = :t, forfatter = :f, finished = :fin
-      WHERE pladeId = :id AND kortId = :k",
+      WHERE pladeId = :pId AND kortId = :kId",
     [
       ':t' => $titel,
       ':f' => $forfatter,
       ':fin' => $finished,
-      ':id' => $pladeId,
-      ':k'  => $kortId
+      ':pId' => $pladeId,
+      ':kId'  => $kortId
     ],
     false
   );
@@ -94,7 +76,7 @@ $squares = $db->sql(
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 
-<body class="bg-light d-flex flex-column justify-content-center align-items-center vh-100 text-center">
+<body class="bg-light">
 
 <?php if (isset($_GET['registered'])): ?>
     <div class="alert alert-success text-center mb-3">
@@ -102,6 +84,12 @@ $squares = $db->sql(
     </div>
 <?php endif;
 ?>
+
+<div class="container py-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h4 m-0">Bog Bingo</h1>
+        <a class="btn btn-outline-secondary btn-sm" href="logout.php">Log ud</a>
+    </div>
 
 <?php
 $cards = [
@@ -116,32 +104,19 @@ while (count($cards) < 24) {
 }
 ?>
 
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="h4 m-0">Bog Bingo</h1>
-        <a class="btn btn-outline-secondary btn-sm" href="logout.php">Log ud</a>
-    </div>
 
-    <!-- Progress placeholder (JS can update later) -->
-    <div class="mb-4">
-        <div class="d-flex justify-content-between small">
-            <span>Fremgang: <span id="doneCount">0</span>/24</span>
-            <span id="percentLabel">0%</span>
-        </div>
-        <div class="progress">
-            <div id="progressBar" class="progress-bar" style="width:0%"></div>
-        </div>
-    </div>
+
+
 
     <!-- Responsive grid -->
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-3">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-1">
         <?php foreach ($cards as $c): ?>
             <div class="col">
                 <div class="card h-100">
                     <div class="card-body">
                         <h5 class="card-title"><?= htmlspecialchars($c['titel']) ?></h5>
                         <p class="card-text"><?= htmlspecialchars($c['text']) ?></p>
-                        <a href="<?= htmlspecialchars($c['link']) ?>" class="btn btn-primary">Åbn</a>
+                        <a href="<?= htmlspecialchars($c['link']) ?>" class="btn btn-success">Åbn</a>
                     </div>
                 </div>
             </div>
@@ -152,6 +127,7 @@ while (count($cards) < 24) {
 
 
 <script src="assets/js/app.js"></script>
+
 </body>
 
 
