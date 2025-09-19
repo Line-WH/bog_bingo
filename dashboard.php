@@ -57,6 +57,9 @@ $squares = $db->sql(
     ORDER BY p.promptId",
   [':k' => $kortId]
 );
+
+$prompts = $db->sql("SELECT promptId, label FROM {$TBL_PROMPTS} ORDER BY promptId"
+);
 ?>
 
 
@@ -78,57 +81,30 @@ $squares = $db->sql(
 
 <body class="bg-light">
 
-<?php if (isset($_GET['registered'])): ?>
-    <div class="alert alert-success text-center mb-3">
-        Konto oprettet!
+    <?php if (isset($_GET['registered'])): ?>
+        <div class="alert alert-success text-center mb-3">
+            Konto oprettet!
+        </div>
+    <?php endif;
+    ?>
+
+    <div class="container py-4">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <h1 class="h4 m-0">Bog Bingo</h1>
+            <a class="btn btn-outline-secondary btn-sm" href="logout.php">Log ud</a>
+        </div>
     </div>
-<?php endif;
-?>
 
-<div class="container py-4">
-    <div class="d-flex justify-content-between align-items-center mb-3">
-        <h1 class="h4 m-0">Bog Bingo</h1>
-        <a class="btn btn-outline-secondary btn-sm" href="logout.php">Log ud</a>
-    </div>
-
-<?php
-$cards = [
-        ["titel" => "kort 1", "text" => " her skal der stå noget tekst", "link" =>"#"],
-        ["titel" => "kort 2", "text" => " her skal der stå noget tekst", "link" =>"#"],
-        ["titel" => "kort 3", "text" => " her skal der stå noget tekst", "link" =>"#"]
-
-];
-while (count($cards) < 24) {
-    $i = count($cards) + 1;
-    $cards[] = ["titel" => "kort $i", "text" => "beskrivelse for kort $i", "link" =>"#"];
-}
-?>
-
-
-
-
-
-    <!-- Responsive grid -->
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 g-1">
-        <?php foreach ($cards as $c): ?>
-            <div class="col">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title"><?= htmlspecialchars($c['titel']) ?></h5>
-                        <p class="card-text"><?= htmlspecialchars($c['text']) ?></p>
-                        <a href="<?= htmlspecialchars($c['link']) ?>" class="btn btn-success">Åbn</a>
-                    </div>
+    <?php foreach ($prompts as $prompt): ?>
+        <div class="col">
+            <div class="card">
+                <div class="card-body">
+                    <?= htmlspecialchars($prompt->label) ?>
                 </div>
             </div>
-        <?php endforeach; ?>
-    </div>
-</div>
-
-
-
-<script src="assets/js/app.js"></script>
+        </div>
+    <?php endforeach; ?>
 
 </body>
-
-
 </html>
+
