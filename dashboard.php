@@ -23,7 +23,7 @@ $TBL_PROMPTS = 'bingoPrompts'; // promptId, label
 $row = $db->sql("SELECT kortId FROM {$TBL_PLADER} WHERE loginId = :loginId LIMIT 1", [':loginId' => $userId]);
 $kortId = $row[0]->kortId;
 
-/* 2) Handle update of a square */
+/* opdatering af card modals */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pladeId'])) {
   $pladeId   = $_POST['pladeId'];
   $titel     = trim($_POST['titel'] ?? '');
@@ -95,15 +95,87 @@ $prompts = $db->sql("SELECT promptId, label FROM {$TBL_PROMPTS} ORDER BY promptI
         </div>
     </div>
 
-    <?php foreach ($prompts as $prompt): ?>
-        <div class="col">
-            <div class="card">
-                <div class="card-body">
-                    <?= htmlspecialchars($prompt->label) ?>
-                </div>
-            </div>
+    <div class="container py-4">
+        <div class="row row-cols-4">
+            <?php foreach ($prompts as $prompt): ?>
+                    <div class="card g-2 h-100"
+                         role="button"
+                         data-bs-toggle="modal"
+                         data-bs-target="#cardModal"
+                         data-prompt-id="$prompt->promptId" data-prompt-label="<?= htmlspecialchars($prompt->label) ?>">
+                        <div class="card-body text-center">
+                            <?= htmlspecialchars($prompt->label) ?>
+                        </div>
+                    </div>
+            <?php endforeach; ?>
         </div>
-    <?php endforeach; ?>
+    </div>
+
+    <div class="modal fade" id="cardModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <form class="modal-content" method="post" action="saveEntry.php">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <span id="cmPromptLabel">Prompt</span>
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                </div>
+
+                <div class="modal-body">
+                    <input type="hidden" name="prompt_id" id="cmPromptId">
+                    <input type="hidden" name="action" id="cmAction" value="save">
+
+                    <div class="mb-3">
+                        <label class="form-label">Title</label>
+                        <input name="title" id="cmTitle" class="form-control" maxlength="255">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Author</label>
+                        <input name="author" id="cmAuthor" class="form-control" maxlength="255">
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Pages</label>
+                        <input type="number" name="pages" id="cmPages" class="form-control" min="1">
+                    </div>
+
+                    <div class="row g-2">
+                        <div class="col">
+                            <label class="form-label">Started</label>
+                            <input type="date" name="started_at" id="cmStarted" class="form-control">
+                        </div>
+                        <div class="col">
+                            <label class="form-label">Finished</label>
+                            <input type="date" name="finished_at" id="cmFinished" class="form-control">
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <label class="form-label">Notes</label>
+                        <textarea name="notes" id="cmNotes" class="form-control" rows="3"></textarea>
+                    </div>
+                </div>
+
+                <div class="modal-footer justify-content-between">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary"
+                                onclick="document.querySelector('cmAction').value='save'">
+                            Save / Update
+                        </button>
+
+                        <button type="submit" class="btn btn-success"
+                                onclick="document.querySelector('cmAction').value='finish'">
+                            Mark as finished
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
 
 </body>
 </html>
