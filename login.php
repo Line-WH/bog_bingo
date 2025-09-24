@@ -43,31 +43,31 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 </head>
 <body class="bg-light d-flex flex-column justify-content-center align-items-center text-center vh-100">
 
-    <div class="card p-4 shadow" style="min-width:320px;max-width:420px;">
-        <h2 class="mb-3">Log ind</h2>
+<div class="card p-4 shadow" style="min-width:320px;max-width:420px;">
+    <h2 class="mb-3">Log ind</h2>
 
-        <?php if ($msg): ?>
-            <div class="alert alert-info"><?= htmlspecialchars($msg) ?></div>
-        <?php endif; ?>
+    <?php if ($msg): ?>
+        <div class="alert alert-info"><?= htmlspecialchars($msg) ?></div>
+    <?php endif; ?>
 
-        <form method="POST" novalidate>
-            <div class="mb-3 text-start">
-                <label class="form-label">Brugernavn</label>
-                <input type="text" name="username" class="form-control" required>
-            </div>
+    <form method="POST" novalidate>
+        <div class="mb-3 text-start">
+            <label class="form-label">Brugernavn</label>
+            <input type="text" name="username" class="form-control" required>
+        </div>
 
-            <div class="mb-3 text-start">
-                <label class="form-label">Adgangskode</label>
-                <input type="password" name="password" class="form-control" required>
-            </div>
+        <div class="mb-3 text-start">
+            <label class="form-label">Adgangskode</label>
+            <input type="password" name="password" class="form-control" required>
+        </div>
 
-            <button class="btn btn-success w-100">Log ind</button>
-        </form>
+        <button class="btn btn-success w-100">Log ind</button>
+    </form>
 
-        <p class="mt-3 mb-0">
-            Har du ikke en konto? <a href="register.php">Opret en her</a>.
-        </p>
-    </div>
+    <p class="mt-3 mb-0">
+        Har du ikke en konto? <a href="register.php">Opret en her</a>.
+    </p>
+</div>
 </body>
 
 

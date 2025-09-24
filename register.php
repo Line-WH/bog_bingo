@@ -4,63 +4,66 @@
  */
 
 require "settings/init.php";
-require "classes/Auth.php";
+
 session_start();
 
 $error = "";
-$username = "";
+$success = "";
 
-if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    $username = trim($_POST["username"] ?? "");
-    $password = $_POST["password"] ?? "";
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $username = htmlspecialchars($_POST["username"]);
+    $password = htmlspecialchars($_POST["password"]);
 
-    $error = Auth::register($db, $username, $password);
-
-    if ($error === "") {
-        // Fetcher LoginId
-        $user = Auth::getUserByUsername($db, $username);
-        Auth::loginUserSession((int)$user->loginId, $user->loginNavn);
-
-        header("Location: dashboard.php?registered=1");
+    if (strlen($username) < 3 || strlen($username) > 14) {
+        $error = "Username must be between 3 and 14 characters";
+    } else {
+        $_SESSION["userId"] = $username;
+        header("location: dashboard.php");
         exit();
     }
 }
 ?>
-<!doctype html>
+
+<!DOCTYPE html>
 <html lang="da">
 <head>
     <meta charset="utf-8">
-    <title>Registrer · Bog Bingo</title>
+
+    <title>Bog Bingo</title>
+
+    <meta name="robots" content="All">
+    <meta name="author" content="Udgiver">
+    <meta name="copyright" content="Information om copyright">
+
+    <link href="css/styles.css" rel="stylesheet" type="text/css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link href="css/styles.css" rel="stylesheet">
 </head>
+
 <body class="bg-light d-flex flex-column justify-content-center align-items-center vh-100 text-center">
-<div class="card p-4 shadow" style="min-width:320px;max-width:420px;">
-    <h2 class="mb-3">Opret Konto</h2>
+
+<div class="card p-4 shadow" style="min-width: 300px;">
+    <h2 class="mb-3">Register</h2>
 
     <?php if ($error): ?>
-        <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+        <div class="alert alert-danger"><?= $error ?></div>
     <?php endif; ?>
 
-    <form method="POST" novalidate>
-        <div class="mb-3 text-start">
-            <label class="form-label">Brugernavn</label>
-            <input type="text" name="username" class="form-control"
-                   minlength="3" maxlength="20"
-                   value="<?= htmlspecialchars($username) ?>" required>
+    <form method="POST">
+        <div class="mb-3">
+            <label class="form-label">Username</label>
+            <input type="text" name="username" class="form-control" required>
         </div>
 
-        <div class="mb-3 text-start">
-            <label class="form-label">Adgangskode</label>
-            <input type="password" name="password" class="form-control" minlength="8" required>
+        <div class="mb-3">
+            <label class="form-label">Password</label>
+            <input type="password" name="password" class="form-control" required>
         </div>
 
-        <button class="btn btn-success w-100">Opret konto</button>
+        <button class="btn btn-success w-100" type="submit">Register</button>
     </form>
-
-    <p class="mt-3 mb-0">
-        Har du allerede en konto? <a href="login.php">Login her</a>.
-    </p>
 </div>
+
 </body>
 </html>
