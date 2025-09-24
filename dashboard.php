@@ -104,10 +104,15 @@ $prompts = $db->sql("SELECT promptId, label FROM {$TBL_PROMPTS} ORDER BY promptI
                          style="cursor:pointer"
                          data-bs-toggle="modal"
                          data-bs-target="#cardModal"
-                         data-prompt-id="$prompt->promptId" data-prompt-label="<?= htmlspecialchars($prompt->label) ?>">
+                         data-prompt-id="<?= $prompt -> promptId?>"
+                         data-prompt-label="<?= htmlspecialchars($prompt->label) ?>"
+                         data-prompt-name="<?= htmlspecialchars($prompt->name) ?>"
+                    >
+
                         <div class="card-body text-center">
                             <?= htmlspecialchars($prompt->label) ?>
                         </div>
+
                     </div>
             <?php endforeach; ?>
         </div>
@@ -115,10 +120,10 @@ $prompts = $db->sql("SELECT promptId, label FROM {$TBL_PROMPTS} ORDER BY promptI
 
     <div class="modal fade" id="cardModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
-            <form class="modal-content" method="post" action="saveEntry.php">
+            <form class="modal-content" id="modalForm" method="post" action="saveEntry.php" enctype="multipart/form-data">
                 <div class="modal-header">
                     <h5 class="modal-title">
-                        <span id="cmPromptLabel">Prompt</span>
+                        <span id="cmPromptLabel"></span>
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"
                             aria-label="Close"></button>
@@ -129,19 +134,19 @@ $prompts = $db->sql("SELECT promptId, label FROM {$TBL_PROMPTS} ORDER BY promptI
                     <input type="hidden" name="action" id="cmAction" value="save">
 
                     <div class="mb-3">
-                        <label class="form-label">Titel</label>
+                        <label for="cmTitle" class="form-label">Titel</label>
                         <input name="titel" id="cmTitle" class="form-control" maxlength="255">
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Forfatter</label>
+                        <label for="cmAuthor" class="form-label">Forfatter</label>
                         <input name="forfatter" id="cmAuthor" class="form-control" maxlength="255">
                     </div>
 
                     <div class="row g-2">
                         <div class="col">
-                            <label class="form-label">Cover</label>
-                            <input type="file" name="cover" id="cmCover" class="form-control">
+                            <label for="cmCover" class="form-label">Cover</label>
+                            <input type="file" name="cover" id="cmCover" class="form-control" accept="image/*">
                         </div>
 
                     <div class="mt-3">
@@ -151,17 +156,13 @@ $prompts = $db->sql("SELECT promptId, label FROM {$TBL_PROMPTS} ORDER BY promptI
 
                     <div class="">
                         <label class="form-label">Færdig</label>
-                        <input type="checkbox" name="færdig" id="cmFin" class="form-control">
+                        <input type="checkbox" name="finished" id="cmFin" class="">
                     </div>
                 </div>
 
-                <div class="modal-footer justify-content-between">
-                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
-
                     <div class="d-flex gap-2">
-                        <button type="submit" class="btn btn-primary"
-                                onclick="document.querySelector('cmAction').value='save'">
-                            Save / Update
+                        <button type="submit" class="btn btn-success" name="">
+                            Gem
                         </button>
                     </div>
                 </div>
@@ -170,9 +171,36 @@ $prompts = $db->sql("SELECT promptId, label FROM {$TBL_PROMPTS} ORDER BY promptI
     </div>
 
     <script>
+        /*henter titel fra kort og tager med i modal*/
         document.addEventListener('DOMContentLoaded', () => {
             const modalElement = document.querySelector('#cardModal');
 
+            modalElement.addEventListener('show.bs.modal', (e) => {
+                const trigger = e.relatedTarget; //clicked card
+                if (!trigger) return;
+                const label = trigger.getAttribute('data-prompt-label');
+                const id = trigger.getAttribute('data-prompt-id');
+                document.querySelector('#cmPromptLabel').textContent = label;
+                document.querySelector('#cmPromptId').value = id;
+
+
+
+            });
+
+            const form = document.getElementById('modalForm');
+            form.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                let titel = document.getElementsByName('titel'); //er lets fordi de kan udfyldes og ændres
+                let forfatter = document.getElementsByName('forfatter');
+                let cover = document.getElementsByName('cover');
+                let noter = document.getElementsByName('noter');
+                let finished = document.getElementsByName('finished');
+
+                //gem til database
+
+
+            })
         })
     </script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
