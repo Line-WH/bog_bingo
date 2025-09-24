@@ -19,7 +19,7 @@ $TBL_PLADER  = 'bingoPlade';   // kortId, loginId, kortDato
 $TBL_KORT    = 'bingoKort';    // pladeId, kortId, promptId, titel, ...
 $TBL_PROMPTS = 'bingoPrompts'; // promptId, label
 
-/* sørger for at bruger har en row henter kortId ned */
+/* sørger for at bruger har en row og henter kortId ned */
 $row = $db->sql("SELECT kortId FROM {$TBL_PLADER} WHERE loginId = :loginId LIMIT 1", [':loginId' => $userId]);
 $kortId = $row[0]->kortId;
 
@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pladeId'])) {
   exit;
 }
 
-/* 3) Load squares */
+/* loader individuelle kort */
 $squares = $db->sql(
   "SELECT k.pladeId, k.titel, k.forfatter, k.finished, p.label
      FROM {$TBL_KORT} k
@@ -75,6 +75,7 @@ $prompts = $db->sql("SELECT promptId, label FROM {$TBL_PROMPTS} ORDER BY promptI
     <meta name="copyright" content="Information om copyright">
 
     <link href="css/styles.css" rel="stylesheet" type="text/css">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
@@ -100,6 +101,7 @@ $prompts = $db->sql("SELECT promptId, label FROM {$TBL_PROMPTS} ORDER BY promptI
             <?php foreach ($prompts as $prompt): ?>
                     <div class="card g-2 h-100"
                          role="button"
+                         style="cursor:pointer"
                          data-bs-toggle="modal"
                          data-bs-target="#cardModal"
                          data-prompt-id="$prompt->promptId" data-prompt-label="<?= htmlspecialchars($prompt->label) ?>">
@@ -127,34 +129,29 @@ $prompts = $db->sql("SELECT promptId, label FROM {$TBL_PROMPTS} ORDER BY promptI
                     <input type="hidden" name="action" id="cmAction" value="save">
 
                     <div class="mb-3">
-                        <label class="form-label">Title</label>
-                        <input name="title" id="cmTitle" class="form-control" maxlength="255">
+                        <label class="form-label">Titel</label>
+                        <input name="titel" id="cmTitle" class="form-control" maxlength="255">
                     </div>
 
                     <div class="mb-3">
-                        <label class="form-label">Author</label>
-                        <input name="author" id="cmAuthor" class="form-control" maxlength="255">
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="form-label">Pages</label>
-                        <input type="number" name="pages" id="cmPages" class="form-control" min="1">
+                        <label class="form-label">Forfatter</label>
+                        <input name="forfatter" id="cmAuthor" class="form-control" maxlength="255">
                     </div>
 
                     <div class="row g-2">
                         <div class="col">
-                            <label class="form-label">Started</label>
-                            <input type="date" name="started_at" id="cmStarted" class="form-control">
+                            <label class="form-label">Cover</label>
+                            <input type="file" name="cover" id="cmCover" class="form-control">
                         </div>
-                        <div class="col">
-                            <label class="form-label">Finished</label>
-                            <input type="date" name="finished_at" id="cmFinished" class="form-control">
-                        </div>
-                    </div>
 
                     <div class="mt-3">
-                        <label class="form-label">Notes</label>
-                        <textarea name="notes" id="cmNotes" class="form-control" rows="3"></textarea>
+                        <label class="form-label">Noter</label>
+                        <textarea name="noter" id="cmNotes" class="form-control" rows="3"></textarea>
+                    </div>
+
+                    <div class="">
+                        <label class="form-label">Færdig</label>
+                        <input type="checkbox" name="færdig" id="cmFin" class="form-control">
                     </div>
                 </div>
 
@@ -166,17 +163,19 @@ $prompts = $db->sql("SELECT promptId, label FROM {$TBL_PROMPTS} ORDER BY promptI
                                 onclick="document.querySelector('cmAction').value='save'">
                             Save / Update
                         </button>
-
-                        <button type="submit" class="btn btn-success"
-                                onclick="document.querySelector('cmAction').value='finish'">
-                            Mark as finished
-                        </button>
                     </div>
                 </div>
             </form>
         </div>
     </div>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const modalElement = document.querySelector('#cardModal');
+
+        })
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
 
