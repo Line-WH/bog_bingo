@@ -14,8 +14,8 @@ if (!$userId) {           // Sikkerhed for hvis der ikke kan findes en bruger, s
 }
 
 /*Tabelnavne */
-$TBL_PLADER  = 'bingoPlade';   // kortId, loginId, kortDato
-$TBL_KORT    = 'bingoKort';    // pladeId, kortId, promptId, titel, ...
+$TBL_PLADER  = 'bingoPlade';   // kortId og kortDato og henter loginId
+$TBL_KORT    = 'bingoKort';    // KortId, men inheriter promptId og pladeId (pladeId linker til brugerens board)
 $TBL_PROMPTS = 'bingoPrompts'; // promptId, label
 
 /* sørger for at bruger har en row og henter kortId ned */
