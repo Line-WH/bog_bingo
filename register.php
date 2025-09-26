@@ -4,6 +4,7 @@
  */
 
 require "settings/init.php";
+require "classes/auth.php";
 
 session_start();
 
@@ -17,6 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if (strlen($username) < 3 || strlen($username) > 14) {
         $error = "Username must be between 3 and 14 characters";
     } else {
+        Auth::register($db, $username, $password);
         $_SESSION["userId"] = $username;
         header("location: dashboard.php");
         exit();
