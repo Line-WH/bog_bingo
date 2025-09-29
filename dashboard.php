@@ -22,6 +22,7 @@ $TBL_PROMPTS = 'bingoPrompts'; // promptId, label
 $row = $db->sql("SELECT kortId FROM {$TBL_PLADER} WHERE loginId = :loginId LIMIT 1", [':loginId' => $userId]);
 $kortId = $row[0]->kortId;
 
+
 /* opdatering af card modals */
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pladeId'])) {
     $pladeId   = $_POST['pladeId'];
@@ -47,6 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['pladeId'])) {
     exit;
 }
 
+
+
 /* loader individuelle kort */
 $squares = $db->sql(
         "SELECT k.pladeId, k.titel, k.forfatter, k.finished, p.label
@@ -54,7 +57,7 @@ $squares = $db->sql(
      JOIN {$TBL_PROMPTS} p USING (promptId)
     WHERE k.kortId = :k
     ORDER BY p.promptId",
-        [':k' => $kortId]
+        [':k' => $kortId] [':k' => $kortId]
 );
 
 $prompts = $db->sql("SELECT promptId, label FROM {$TBL_PROMPTS} ORDER BY promptId");
