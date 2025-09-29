@@ -43,7 +43,7 @@ if ($pladeId === null) {
     die("Kunne ikke oprette eller hente din bingoplade. Prøv at genindlæse siden.");
 }
 
-/* 3) Hent kort til DENNE plade — brug pladeId (ikke k.kortId) */
+//henter kort til PladeId
 $squares = $db->sql(
         "SELECT k.pladeId, k.titel, k.forfatter, k.finished, p.promptId, p.label
      FROM {$TBL_KORT} k
@@ -82,27 +82,41 @@ $prompts = $db->sql("SELECT promptId, label FROM {$TBL_PROMPTS} ORDER BY promptI
         </div>
     </div>
 
+    <?php
+    $byPrompt = [];
+    foreach ($squares as $row) {
+        $byPrompt[$row->promptId] = $row;
+    }
+    ?>
+
     <div class="container py-4">
-        <div class="row row-cols-4">
-            <?php foreach ($prompts as $prompt): ?>
-                <div class="card g-2 h-100"
-                     role="button"
-                     style="cursor:pointer"
-                     data-bs-toggle="modal"
-                     data-bs-target="#cardModal"
-                     data-prompt-id="<?= $prompt -> promptId?>"
-                     data-prompt-label="<?= htmlspecialchars($prompt->label) ?>"
-                     data-prompt-name="<?= htmlspecialchars($prompt->name) ?>"
-                >
-
-                    <div class="card-body text-center">
-                        <?= htmlspecialchars($prompt->label) ?>
+        <div class="row row-cols-4 g-2">
+            <?php foreach ($prompts as $prompt):
+                $p = $byPrompt[$prompt->promptId] ?? null;
+                ?>
+                <div class="col">
+                    <div class="card h-100"
+                         role="button"
+                         style="cursor:pointer"
+                         data-bs-toggle="modal"
+                         data-bs-target="#cardModal"
+                         data-prompt-id="<?= $prompt->promptId ?>"
+                         data-prompt-label="<?= htmlspecialchars($prompt->label) ?>"
+                            <?php if ($p): ?>
+                                data-title="<?= htmlspecialchars($p->titel ?? '') ?>"
+                                data-author="<?= htmlspecialchars($p->forfatter ?? '') ?>"
+                                data-finished="<?= (int)($p->finished ?? 0) ?>"
+                            <?php endif; ?>
+                    >
+                        <div class="card-body text-center">
+                            <?= htmlspecialchars($prompt->label) ?>
+                        </div>
                     </div>
-
                 </div>
             <?php endforeach; ?>
         </div>
     </div>
+
 
     <div class="modal fade" id="cardModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -158,23 +172,28 @@ $prompts = $db->sql("SELECT promptId, label FROM {$TBL_PROMPTS} ORDER BY promptI
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
 
         /*henter titel fra kort og tager med i modal*/
-        document.addEventListener('DOMContentLoaded', () => {
-            const modalElement = document.querySelector('#cardModal');
+            document.addEventListener('DOMContentLoaded', () => {
+            const modalEl = document.getElementById('cardModal');
 
-            modalElement.addEventListener('show.bs.modal', (e) => {
-                const trigger = e.relatedTarget; //clicked card
-                if (!trigger) return;
-                const label = trigger.getAttribute('data-prompt-label');
-                const id = trigger.getAttribute('data-prompt-id');
-                document.querySelector('#cmPromptLabel').textContent = label;
-                document.querySelector('#cmPromptId').value = id;
+            modalEl.addEventListener('show.bs.modal', (e) => {
+            const card = e.relatedTarget;
+            if (!card) return;
 
-            });
+            document.getElementById('cmPromptLabel').textContent = card.dataset.promptLabel || '';
+            document.getElementById('cmPromptId').value = card.dataset.promptId || '';
 
-            const form = document.getElementById('modalForm');
+            // Prefill
+            document.getElementById('cmTitle').value  = card.dataset.title  ?? '';
+            document.getElementById('cmAuthor').value = card.dataset.author ?? '';
+            document.getElementById('cmNotes').value  = '';
+            document.getElementById('cmFin').checked  = card.dataset.finished === '1';
+        });
+
+    const form = document.getElementById('modalForm');
             form.addEventListener('submit', (e) => {
                 e.preventDefault();
 
