@@ -4,23 +4,24 @@
  */
 
 require "settings/init.php";
-require "classes/auth.php";
-
+require "classes/Auth.php";
 session_start();
 
 $error = "";
-$success = "";
+$username = "";
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $username = htmlspecialchars($_POST["username"]);
-    $password = htmlspecialchars($_POST["password"]);
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    $username = trim($_POST["username"] ?? "");
+    $password = $_POST["password"] ?? "";
 
-    if (strlen($username) < 3 || strlen($username) > 14) {
-        $error = "Username must be between 3 and 14 characters";
-    } else {
-        Auth::register($db, $username, $password);
-        $_SESSION["userId"] = $username;
-        header("location: dashboard.php");
+    $error = Auth::register($db, $username, $password);
+
+    if ($error === "") {
+        // Fetcher LoginId
+        $user = Auth::getUserByUsername($db, $username);
+        Auth::loginUserSession((int)$user->loginId, $user->loginNavn);
+
+        header("Location: dashboard.php?registered=1");
         exit();
     }
 }

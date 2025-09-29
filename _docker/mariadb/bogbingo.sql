@@ -51,6 +51,8 @@ CREATE TABLE `bingoPlade` (
   `kortDato` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
 
+
+
 -- --------------------------------------------------------
 
 --
