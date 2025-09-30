@@ -134,6 +134,7 @@ $prompts = $db->sql("SELECT promptId, label FROM {$TBL_PROMPTS} ORDER BY promptI
                 <div class="modal-body">
                     <input type="hidden" name="prompt_id" id="cmPromptId">
                     <input type="hidden" name="action" id="cmAction" value="save">
+                    <input type="hidden" name="plade_id" value="<?=$pladeId?>">
 
                     <div class="mb-3">
                         <label for="cmTitle" class="form-label">Titel</label>
@@ -175,11 +176,11 @@ $prompts = $db->sql("SELECT promptId, label FROM {$TBL_PROMPTS} ORDER BY promptI
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
 
-        /*henter titel fra kort og tager med i modal*/
+        //henter titel fra kort og tager med i modal
             document.addEventListener('DOMContentLoaded', () => {
-            const modalEl = document.getElementById('cardModal');
+            const modalElement = document.getElementById('cardModal');
 
-            modalEl.addEventListener('show.bs.modal', (e) => {
+            modalElement.addEventListener('show.bs.modal', (e) => {
             const card = e.relatedTarget;
             if (!card) return;
 
@@ -193,21 +194,42 @@ $prompts = $db->sql("SELECT promptId, label FROM {$TBL_PROMPTS} ORDER BY promptI
             document.getElementById('cmFin').checked  = card.dataset.finished === '1';
         });
 
-    const form = document.getElementById('modalForm');
-            form.addEventListener('submit', (e) => {
-                e.preventDefault();
+        //submit/save funktion
+        const form = document.getElementById('modalForm');
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
 
-                let titel = document.getElementsByName('titel'); //er lets fordi de kan udfyldes og ændres
-                let forfatter = document.getElementsByName('forfatter');
-                let cover = document.getElementsByName('cover');
-                let noter = document.getElementsByName('noter');
-                let finished = document.getElementsByName('finished');
+            const formData = new FormData(form); //inkludere form og input felter
 
-                //gem til database
+            try {
+                const response = await fetch('saveEntry.php', {
+                    method: 'POST',
+                    body: formData,
+                });
 
+                const result = await response.json();
 
-            })
-        })
+                //opdatere det klikkede kort og reflektere saved state
+                if (result.status === 'success') {
+                    const promptId = form.querySelector('[name="prompt_id"]').value;
+                    const card = document.querySelector(`[data-prompt-id="${promptId}"]`);
+                    if (card) {
+                        card.dataset.title    = result.data?.titel ?? '';
+                        card.dataset.author   = result.data?.forfatter ?? '';
+                        card.dataset.finished = result.data?.finished ? '1' : '0';
+                    }
+
+                    const modal = bootstrap.Modal.getInstance(modalElement);
+                    modal.hide();
+                } else {
+                    alert(result.message || 'Noget gik galt');
+                }
+            } catch (err) {
+                console.error(err);
+                alert('Netværksfejl');
+            }
+            });
+        });
     </script>
 </body>
 </html>
