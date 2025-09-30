@@ -25,7 +25,7 @@ $theme-colors: map-merge($theme-colors, $custom-colors);
 body { background: #f8f9fa; }
 
 /* Kort & progressbar */
-.card { border: 0; border-radius: 1rem; box-shadow: 0 10px 25px rgba(0,0,0,.08); }
+.card { border: 0; border-radius: 1rem; box-shadow: 0 10px 25px rgba(0,0,0,.08);}
 .progress { height: .75rem; }
 .progress-bar { background-color: var(--bs-success) !important; }
 
@@ -68,6 +68,16 @@ body { background: #f8f9fa; }
 
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce){ .bingo-cell { transition: none; } }
+
+/* Put this in styles.css AFTER Bootstrap */
+.card[data-finished="1"] {
+  text-decoration: line-through;
+  background: var(--bs-success);
+  color: ghostwhite;
+}
+
+
+
 
 
 

@@ -65,8 +65,8 @@ $prompts = $db->sql("SELECT promptId, label FROM {$TBL_PROMPTS} ORDER BY promptI
     <meta name="robots" content="All">
     <meta name="author" content="Udgiver">
     <meta name="copyright" content="Information om copyright">
-    <link href="css/styles.css" rel="stylesheet" type="text/css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="css/styles.css" rel="stylesheet" type="text/css">
     <meta name="viewport" content="width=device-width, initial-scale=1">
 </head>
 <body class="bg-light">
@@ -117,6 +117,16 @@ $prompts = $db->sql("SELECT promptId, label FROM {$TBL_PROMPTS} ORDER BY promptI
         </div>
     </div>
 
+    <div class="container">
+        <div class="d-flex justify-content-between align-items-center mb-1">
+            <div id="progressText" class="small fw-medium">0/0 færdige</div>
+            <div id="progressPct" class="small text-muted">0%</div>
+        </div>
+        <div class="progress" style="height: 12px;">
+            <div id="progressBar" class="progress-bar" role="progressbar"
+            aria-valuemin="0" aria-valuemax="100" style="width:0%"></div>
+        </div>
+    </div>
 
     <div class="modal fade" id="cardModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
@@ -217,6 +227,8 @@ $prompts = $db->sql("SELECT promptId, label FROM {$TBL_PROMPTS} ORDER BY promptI
                         card.dataset.title    = result.data?.titel ?? '';
                         card.dataset.author   = result.data?.forfatter ?? '';
                         card.dataset.finished = result.data?.finished ? '1' : '0';
+                        syncCardUI(card);
+                        updateProgress();
                     }
 
                     const modal = bootstrap.Modal.getInstance(modalElement);
@@ -230,6 +242,32 @@ $prompts = $db->sql("SELECT promptId, label FROM {$TBL_PROMPTS} ORDER BY promptI
             }
             });
         });
+
+        //progresstrackeren
+        function updateProgress() {
+            const cards = document.querySelectorAll('.card[data-prompt-id]');
+            const total = cards.length;
+            let done = 0;
+            cards.forEach(c => { if ((c.dataset.finished || '0') === '1') done++; });
+
+            const pct = total ? Math.round((done / total) * 100) : 0;
+
+            document.getElementById('progressText').textContent = `${done}/${total} færdige`;
+            document.getElementById('progressPct').textContent = `${pct}%`;
+
+            const bar = document.getElementById('progressBar');
+            bar.style.width = `${pct}%`;
+            bar.setAttribute('aria-valuenow', String(pct));
+            bar.classList.toggle('bg-success', pct === 100);
+        }
+
+        function syncCardUI(card) {
+            // toggler grøn farve til færdige kort
+            card.classList.toggle('done', (card.dataset.finished || '0') === '1');
+        }
+            document.querySelectorAll('.card[data-prompt-id]').forEach(syncCardUI);
+            updateProgress();
+
     </script>
 </body>
 </html>
