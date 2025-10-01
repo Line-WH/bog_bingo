@@ -1,3 +1,4 @@
+//Finder HTML-elementer//
 const grid = document.querySelector('#bingoGrid');
 const totalCountEl = document.querySelector('#totalCount');
 const checkedCountEl = document.querySelector('#checkedCount');
@@ -6,9 +7,11 @@ const progressPctEl = document.querySelector('#progressPct');
 const resetBtn = document.querySelector('#resetBtn');
 const shareBtn = document.querySelector('#shareBtn');
 
+//listen af task gemmes i localstorage//
 let tasks = [];
 const STORAGE_KEY = 'bogbingo_tasks_v2';
 
+//Henter task fra JSON via fetch//
 function loadTasks() {
     fetch('./tasks.json')
         .then(res => {
@@ -16,7 +19,7 @@ function loadTasks() {
             return res.json();
         })
         .then(data => {
-            // gem tasks fra JSON
+            // gem tasks fra JSON//
             tasks = data.map((t, i) => ({
                 id: i + 1,
                 text: t.text,
@@ -32,11 +35,12 @@ function loadTasks() {
             console.error('Kunne ikke loade tasks.json:', err);
         });
 }
-
+//Gemmer tasks i localstorage//
 function saveTasks() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
 }
 
+//Opdaterer progress bar og tællere//
 function updateProgress() {
     const total = tasks.length || 1;
     const done = tasks.filter(t => t.done).length;
@@ -52,6 +56,7 @@ function updateProgress() {
     progressBar.classList.toggle('bg-primary', done === 0);
 }
 
+//skifter status på task//
 function toggleTask(task, cell) {
     task.done = !task.done;
     cell.classList.toggle('completed', task.done);
@@ -59,7 +64,7 @@ function toggleTask(task, cell) {
     saveTasks();
     updateProgress();
 }
-
+//renderGrid viser alle bog-filter under progress baren (bygger celler ud fra tasks)//
 function renderGrid() {
     grid.innerHTML = '';
     tasks.forEach(task => {
@@ -73,7 +78,7 @@ function renderGrid() {
         const img = document.createElement('img');
         img.src = task.img;
         img.alt = task.text;
-        img.className = 'bingo-img img-fluid'; // <-- behold img-fluid her!
+        img.className = 'bingo-img img-fluid';
         cell.appendChild(img);
 
         const text = document.createElement('span');
@@ -94,14 +99,14 @@ function renderGrid() {
     });
 }
 
-
+//Nulstil-knap //
 resetBtn.addEventListener('click', () => {
     tasks.forEach(t => t.done = false);
     saveTasks();
     renderGrid();
     updateProgress();
 });
-
+//Del-knap//
 shareBtn.addEventListener('click', () => {
     const total = tasks.length || 1;
     const done = tasks.filter(t => t.done).length;
