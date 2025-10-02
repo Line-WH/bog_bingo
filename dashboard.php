@@ -131,7 +131,7 @@ $prompts = $db->sql("SELECT promptId, label FROM {$TBL_PROMPTS} ORDER BY promptI
     <div class="modal fade" id="cardModal" tabindex="-1" aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered">
 
-            <form class="modal-content" id="modalForm" method="post" action="saveEntry.php" enctype="multipart/form-data">
+            <form class="modal-content" id="modalForm" method="post" action="saveEntry.php">
                 <div class="modal-header">
                     <h5 class="modal-title">
                         <span id="cmPromptLabel"></span>
@@ -157,11 +157,6 @@ $prompts = $db->sql("SELECT promptId, label FROM {$TBL_PROMPTS} ORDER BY promptI
                     </div>
 
                     <div class="row g-2">
-                        <div class="col">
-                            <label for="cmCover" class="form-label">Cover</label>
-                            <input type="file" name="cover" id="cmCover" class="form-control" accept="image/*">
-                        </div>
-
                         <div class="mt-3">
                             <label class="form-label">Noter</label>
                             <textarea name="noter" id="cmNotes" class="form-control" rows="3"></textarea>
@@ -210,6 +205,9 @@ $prompts = $db->sql("SELECT promptId, label FROM {$TBL_PROMPTS} ORDER BY promptI
             e.preventDefault();
 
             const formData = new FormData(form); //inkludere form og input felter
+            for (const [k, v] of formData.entries()) {
+                console.log(k, v);
+            }
 
             try {
                 const response = await fetch('saveEntry.php', {
