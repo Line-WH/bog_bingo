@@ -35,10 +35,10 @@ $DB_PASS = "";
 define("CONFIG_LIVE", "0"); // 0: Test enviroment || 1: Live enviroment
 
 if(CONFIG_LIVE == 0) {
-    $DB_SERVER = "mariadb";
-    $DB_NAME = "bogbingo";
-    $DB_USER = "user";
-    $DB_PASS = "password";
+    $DB_SERVER = "mysql93.unoeuro.com";
+    $DB_NAME = "phaneiros_dk_db_test";
+    $DB_USER = "phaneiros_dk";
+    $DB_PASS = "Dm6AkfFe4dEbGtgynhzr";
 } else if(CONFIG_LIVE == 1) {
     $DB_SERVER = "";
     $DB_NAME = "";

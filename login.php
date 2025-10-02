@@ -4,7 +4,7 @@
  */
 
 require "settings/init.php";
-require "classes/Auth.php";
+require "classes/auth.php";
 
 session_start();
 

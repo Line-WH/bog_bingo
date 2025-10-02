@@ -37,7 +37,7 @@ CREATE TABLE `bingoKort` (
   `coverUrl` varchar(500) DEFAULT NULL,
   `finished` tinyint(1) DEFAULT NULL,
   `opdateret` timestamp NULL DEFAULT NULL ON UPDATE current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- --------------------------------------------------------
 
@@ -49,7 +49,7 @@ CREATE TABLE `bingoPlade` (
   `kortId` int(10) UNSIGNED NOT NULL,
   `loginId` int(10) UNSIGNED NOT NULL,
   `kortDato` timestamp NOT NULL DEFAULT current_timestamp()
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 
 
@@ -62,7 +62,7 @@ CREATE TABLE `bingoPlade` (
 CREATE TABLE `bingoPrompts` (
   `promptId` tinyint(3) UNSIGNED NOT NULL,
   `label` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Data dump for tabellen `bingoPrompts`
@@ -104,7 +104,7 @@ CREATE TABLE `login` (
   `loginId` int(10) UNSIGNED NOT NULL,
   `loginNavn` varchar(100) NOT NULL,
   `loginKodeord` varchar(100) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 --
 -- Data dump for tabellen `login`
