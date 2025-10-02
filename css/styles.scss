@@ -69,7 +69,7 @@ body { background: #f8f9fa; }
 /* Reduced motion */
 @media (prefers-reduced-motion: reduce){ .bingo-cell { transition: none; } }
 
-/* Put this in styles.css AFTER Bootstrap */
+
 .card[data-finished="1"] {
   text-decoration: line-through;
   background: var(--bs-success);
